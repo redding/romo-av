@@ -1,6 +1,6 @@
 # RomoAv
 
-TODO: Write a gem description
+Audio/Video components for the [Romo UI Toolkit](https://github.com/redding/romo).
 
 ## Usage
 

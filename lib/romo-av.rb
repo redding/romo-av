@@ -1,5 +1,6 @@
+require 'romo'
 require "romo-av/version"
 
-module RomoAv
-  # TODO: your code goes here...
+module Romo::Av
+
 end

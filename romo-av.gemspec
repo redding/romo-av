@@ -5,12 +5,12 @@ require "romo-av/version"
 
 Gem::Specification.new do |gem|
   gem.name        = "romo-av"
-  gem.version     = RomoAv::VERSION
-  gem.authors     = ["TODO: authors"]
-  gem.email       = ["TODO: emails"]
-  gem.description = %q{TODO: Write a gem description}
-  gem.summary     = %q{TODO: Write a gem summary}
-  gem.homepage    = "http://github.com/__/romo-av"
+  gem.version     = Romo::Av::VERSION
+  gem.authors     = ["Kelly Redding", "Collin Redding"]
+  gem.email       = ["kelly@kellyredding.com", "collin.redding@me.com"]
+  gem.description = %q{Romo audio/video components.}
+  gem.summary     = %q{Romo audio/video components.}
+  gem.homepage    = "http://github.com/redding/romo-av"
   gem.license     = 'MIT'
 
   gem.files         = `git ls-files`.split($/)
@@ -18,7 +18,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
-  gem.add_development_dependency("assert", ["~> 2.12"])
-  # TODO: gem.add_dependency("gem-name", ["~> 0.0"])
+  gem.add_development_dependency("assert", ["~> 2.15"])
 
+  gem.add_dependency("romo", ["~> 0.10"])
 end

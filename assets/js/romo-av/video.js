@@ -115,6 +115,73 @@ RomoVideo.prototype.doToggleFullscreen = function() {
   }
 }
 
+// Status methods
+
+RomoVideo.prototype.getPlaybackTime = function() {
+  return this.videoObj.currentTime;
+}
+
+RomoVideo.prototype.getPlaybackFrame = function(frameNum) {
+  return this.getVideoTimeInFrames(this.getPlaybackTime());
+}
+
+RomoVideo.prototype.getPlaybackPercent = function(percent) {
+  if(!this.videoObj.duration){ return 100; }
+  return this.getVideoTimeInPercent(this.getPlaybackTime());
+}
+
+RomoVideo.prototype.getDurationTime = function() {
+  return this.videoObj.duration;
+}
+
+RomoVideo.prototype.getDurationFrames = function(frameNum) {
+  return this.getVideoTimeInFrames(this.getDurationTime());
+}
+
+RomoVideo.prototype.getDurationPercent = function(percent) {
+  if(!this.videoObj.duration){ return 100; }
+  return this.getVideoTimeInPercent(this.getDurationTime());
+}
+
+RomoVideo.prototype.getTotalBufferedTime = function() {
+  return this.getTotalBufferedTuples().reduce(function(prev, curr) {
+    return prev + (curr[1] - curr[0]);
+  }, 0.0);
+}
+
+RomoVideo.prototype.getTotalBufferedFrames = function(frameNum) {
+  return this.getVideoTimeInFrames(this.getTotalBufferedTime());
+}
+
+RomoVideo.prototype.getTotalBufferedPercent = function(percent) {
+  if(!this.videoObj.duration){ return 100; }
+  return this.getVideoTimeInPercent(this.getTotalBufferedTime());
+}
+
+RomoVideo.prototype.getTotalBufferedTuples = function() {
+  var tuples   = [];
+  var buffered = this.videoObj.buffered;
+  for (i = 0; i < buffered.length; i++) {
+    tuples.push([buffered.start(i), buffered.end(i)]);
+  }
+  return tuples;
+}
+
+RomoVideo.prototype.getVideoTimeInFrames = function(time) {
+  if (this.fpsEnabled !== true) {
+    return 0;
+  } else {
+    return Math.floor(time * this.fps);
+  }
+}
+RomoVideo.prototype.getVideoTimeInPercent = function(time) {
+  if (this.videoObj.duration === undefined || this.videoObj.duration === 0.0) {
+    return 100;
+  } else {
+    return Math.floor((time / this.videoObj.duration) * 100);
+  }
+}
+
 // Load methods
 
 RomoVideo.prototype.doLoad = function() {

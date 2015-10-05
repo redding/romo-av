@@ -49,7 +49,6 @@ RomoVideo.prototype.doSetPlaybackToFrame = function(frameNum) {
 }
 
 RomoVideo.prototype.doSetPlaybackToPercent = function(percent) {
-  if(!this.videoObj.duration){ return; }
   this._setPlayback(this._percentToSecondNum(percent));
 }
 
@@ -63,7 +62,6 @@ RomoVideo.prototype.doModPlaybackByFrames = function(frameCount) {
 }
 
 RomoVideo.prototype.doModPlaybackByPercent = function(percent) {
-  if(!this.videoObj.duration){ return; }
   this._setPlayback(this.videoObj.currentTime + this._percentToSecondNum(percent));
 }
 
@@ -121,25 +119,27 @@ RomoVideo.prototype.getPlaybackTime = function() {
   return this.videoObj.currentTime;
 }
 
-RomoVideo.prototype.getPlaybackFrame = function(frameNum) {
+RomoVideo.prototype.getPlaybackFrame = function() {
   return this.getVideoTimeInFrames(this.getPlaybackTime());
 }
 
-RomoVideo.prototype.getPlaybackPercent = function(percent) {
-  if(!this.videoObj.duration){ return 100; }
+RomoVideo.prototype.getPlaybackPercent = function() {
   return this.getVideoTimeInPercent(this.getPlaybackTime());
 }
 
 RomoVideo.prototype.getDurationTime = function() {
-  return this.videoObj.duration;
+  if (this.videoObj.duration === undefined) {
+    return 0.0;
+  } else {
+    return this.videoObj.duration;
+  }
 }
 
-RomoVideo.prototype.getDurationFrames = function(frameNum) {
+RomoVideo.prototype.getDurationFrames = function() {
   return this.getVideoTimeInFrames(this.getDurationTime());
 }
 
-RomoVideo.prototype.getDurationPercent = function(percent) {
-  if(!this.videoObj.duration){ return 100; }
+RomoVideo.prototype.getDurationPercent = function() {
   return this.getVideoTimeInPercent(this.getDurationTime());
 }
 
@@ -149,12 +149,11 @@ RomoVideo.prototype.getTotalBufferedTime = function() {
   }, 0.0);
 }
 
-RomoVideo.prototype.getTotalBufferedFrames = function(frameNum) {
+RomoVideo.prototype.getTotalBufferedFrames = function() {
   return this.getVideoTimeInFrames(this.getTotalBufferedTime());
 }
 
-RomoVideo.prototype.getTotalBufferedPercent = function(percent) {
-  if(!this.videoObj.duration){ return 100; }
+RomoVideo.prototype.getTotalBufferedPercent = function() {
   return this.getVideoTimeInPercent(this.getTotalBufferedTime());
 }
 
@@ -171,14 +170,48 @@ RomoVideo.prototype.getVideoTimeInFrames = function(time) {
   if (this.fpsEnabled !== true) {
     return 0;
   } else {
-    return Math.floor(time * this.fps);
+    var framesCalc = time * this.fps;
+    if (framesCalc >= 0) {
+      return Math.floor(framesCalc) + 1;
+    } else {
+      return Math.ceil(framesCalc) - 1;
+    }
   }
 }
 RomoVideo.prototype.getVideoTimeInPercent = function(time) {
-  if (this.videoObj.duration === undefined || this.videoObj.duration === 0.0) {
+  if (this.getDurationTime() === 0.0) {
     return 100;
   } else {
-    return Math.floor((time / this.videoObj.duration) * 100);
+    return (time / this.getDurationTime()) * 100;
+  }
+}
+RomoVideo.prototype.getVideoFramesInTime = function(frameCount) {
+  if (this.fpsEnabled !== true) {
+    return 0.0;
+  } else {
+    return frameCount / this.fps;
+  }
+}
+RomoVideo.prototype.getVideoFramesInPercent = function(frameCount) {
+  if (this.fpsEnabled !== true) {
+    return 100;
+  } else {
+    return (frameCount / this.getDurationFrames()) * 100;
+  }
+}
+RomoVideo.prototype.getVideoPercentInTime = function(percent) {
+  return (percent / 100) * this.getDurationTime();
+}
+RomoVideo.prototype.getVideoPercentInFrames = function(percent) {
+  if (this.fpsEnabled !== true) {
+    return 0;
+  } else {
+    var framesCalc = (percent / 100) * this.getDurationFrames();
+    if (framesCalc >= 0) {
+      return Math.floor(framesCalc) + 1;
+    } else {
+      return Math.ceil(framesCalc) - 1;
+    }
   }
 }
 
@@ -197,15 +230,16 @@ RomoVideo.prototype.doModSource = function(source) {
 // private
 
 RomoVideo.prototype._setPlayback = function(newSecondNum) {
-  if (newSecondNum > this.videoObj.duration) {
+  var durationTime = this.getDurationTime();
+  if (newSecondNum > durationTime) {
     if (this.elem.prop('loop') === true){
-      this.videoObj.currentTime = (newSecondNum - this.videoObj.duration);
+      this.videoObj.currentTime = newSecondNum - durationTime;
     } else {
-      this.videoObj.currentTime = this.videoObj.duration;
+      this.videoObj.currentTime = durationTime;
     }
   } else if (newSecondNum < 0) {
     if (this.elem.prop('loop') === true){
-      this.videoObj.currentTime = (this.videoObj.duration - (0 - newSecondNum));
+      this.videoObj.currentTime = (durationTime - (0 - newSecondNum));
     } else {
       this.videoObj.currentTime = 0;
     }
@@ -219,7 +253,7 @@ RomoVideo.prototype._frameNumToSecondNum = function(frameNum) {
 }
 
 RomoVideo.prototype._percentToSecondNum = function(percent) {
-  return percent * this.videoObj.duration;
+  return percent * this.getDurationTime();
 }
 
 RomoVideo.prototype._setVolume = function(percent) {

@@ -166,6 +166,20 @@ RomoVideo.prototype.getTotalBufferedTuples = function() {
   return tuples;
 }
 
+// Load methods
+
+RomoVideo.prototype.doLoad = function() {
+  this.doPause();
+  this._loadState();
+  this.videoObj.load();
+}
+
+RomoVideo.prototype.doModSource = function(source) {
+  this.videoObj.src = source;
+}
+
+// Helper methods
+
 RomoVideo.prototype.getVideoTimeInFrames = function(time) {
   if (this.fpsEnabled !== true) {
     return 0;
@@ -215,16 +229,22 @@ RomoVideo.prototype.getVideoPercentInFrames = function(percent) {
   }
 }
 
-// Load methods
+RomoVideo.prototype.getVideoFormattedTime = function(seconds) {
+  if (isNaN(parseInt(seconds)) === true){ return '00:00.000'; }
+  else if (seconds === 0){ return '00:00.000'; }
 
-RomoVideo.prototype.doLoad = function() {
-  this.doPause();
-  this._loadState();
-  this.videoObj.load();
-}
+  var abs  = Math.abs(seconds);
+  var hrs  = Math.floor(abs / 3600);
+  var mins = Math.floor((abs - (hrs * 3600)) / 60);
+  var secs = Math.floor(abs % 60);
+  var ms   = (abs - Math.floor(abs));
 
-RomoVideo.prototype.doModSource = function(source) {
-  this.videoObj.src = source;
+  var t = (hrs ? hrs + ':' : '') +
+          (mins < 10 ? '0' : '') + mins + ':' +
+          (secs < 10 ? '0' : '') + secs + ms.toFixed(3).slice(1);
+
+  if (seconds > 0){ return t; }
+  else{ return '-'+t; }
 }
 
 // private

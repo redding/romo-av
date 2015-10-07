@@ -203,7 +203,7 @@ RomoVideo.prototype.getVideoTimeInFrames = function(time) {
 }
 RomoVideo.prototype.getVideoTimeInPercent = function(time) {
   if (this.getDurationTime() === 0.0) {
-    return 100;
+    return 0;
   } else {
     return (time / this.getDurationTime()) * 100;
   }
@@ -213,7 +213,7 @@ RomoVideo.prototype.getVideoFramesInTime = function(frameCount) {
 }
 RomoVideo.prototype.getVideoFramesInPercent = function(frameCount) {
   if (this.fpsEnabled !== true) {
-    return 100;
+    return 0;
   } else {
     return (frameCount / this.getDurationFrames()) * 100;
   }

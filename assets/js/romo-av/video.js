@@ -86,6 +86,30 @@ RomoVideo.prototype.doToggleMute = function() {
   this.videoObj.muted = !this.videoObj.muted;
 }
 
+RomoVideo.prototype.getLoop = function() {
+  return this.elem.prop('loop');
+}
+
+RomoVideo.prototype.doLoop = function() {
+  this.elem.prop('loop', true);
+  this.elem.trigger('video:loop',       [this.videoObj, this]);
+  this.elem.trigger('video:loopChange', [true, this.videoObj, this]);
+}
+
+RomoVideo.prototype.doNoLoop = function() {
+  this.elem.prop('loop', false);
+  this.elem.trigger('video:noloop',     [this.videoObj, this]);
+  this.elem.trigger('video:loopChange', [false, this.videoObj, this]);
+}
+
+RomoVideo.prototype.doToggleLoop = function() {
+  if (this.getLoop() !== true) {
+    this.doLoop();
+  } else {
+    this.doNoLoop();
+  }
+}
+
 RomoVideo.prototype.doSetVolumnToPercent = function(percent) {
   this._setVolume(volume);
 }

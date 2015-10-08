@@ -76,14 +76,17 @@ RomoVideo.prototype.doModPlaybackByPercent = function(percent) {
 
 RomoVideo.prototype.doMute = function() {
   this.videoObj.muted = true;
+  this.elem.trigger('video:volumechange', [this.videoObj, this]);
 }
 
 RomoVideo.prototype.doUnmute = function() {
   this.videoObj.muted = false;
+  this.elem.trigger('video:volumechange', [this.videoObj, this]);
 }
 
 RomoVideo.prototype.doToggleMute = function() {
   this.videoObj.muted = !this.videoObj.muted;
+  this.elem.trigger('video:volumechange', [this.videoObj, this]);
 }
 
 RomoVideo.prototype.getLoop = function() {
@@ -110,12 +113,12 @@ RomoVideo.prototype.doToggleLoop = function() {
   }
 }
 
-RomoVideo.prototype.doSetVolumnToPercent = function(percent) {
-  this._setVolume(volume);
+RomoVideo.prototype.doSetVolumeToPercent = function(percent) {
+  this._setVolume(percent / 100);
 }
 
 RomoVideo.prototype.doModVolumeByPercent = function(percent) {
-  this._setVolume(this.videoObj.volume + percent);
+  this._setVolume(this.videoObj.volume + (percent / 100));
 }
 
 RomoVideo.prototype.doSetPlaybackToRate = function(rate) {
@@ -203,6 +206,22 @@ RomoVideo.prototype.getTotalBufferedTuples = function() {
     tuples.push([buffered.start(i), buffered.end(i)]);
   }
   return tuples;
+}
+
+RomoVideo.prototype.getVolumeValue = function() {
+  if (this.videoObj.muted === true) {
+    return 0;
+  } else {
+    return this.videoObj.volume;
+  }
+}
+
+RomoVideo.prototype.getVolumePercent = function() {
+  return this.getVolumeValue() * 100;
+}
+
+RomoVideo.prototype.getVolumeMuted = function() {
+  return this.videoObj.muted === true || this.getVolumePercent() === 0;
 }
 
 // Load methods
@@ -302,17 +321,18 @@ RomoVideo.prototype._frameNumToSecondNum = function(frameNum) {
 }
 
 RomoVideo.prototype._percentToSecondNum = function(percent) {
-  return percent * this.getDurationTime();
+  return (percent / 100) * this.getDurationTime();
 }
 
-RomoVideo.prototype._setVolume = function(percent) {
-  if (percent > 1) {
+RomoVideo.prototype._setVolume = function(value) {
+  if (value > 1) {
     this.videoObj.volume = 1;
-  } else if (percent < 0) {
+  } else if (value < 0) {
     this.videoObj.volume = 0;
   } else {
-    this.videoObj.volume = percent;
+    this.videoObj.volume = value;
   }
+  this.doUnmute();
 }
 
 RomoVideo.prototype._loadState = function() {
@@ -457,13 +477,13 @@ RomoVideo.prototype._bindVideoTriggerEvents = function() {
     this.doMute(); return false;
   }, this));
   this.elem.on('video:triggerUnmute', $.proxy(function(e) {
-    this.doUnMute(); return false;
+    this.doUnmute(); return false;
   }, this));
   this.elem.on('video:triggerToggleMute', $.proxy(function(e) {
     this.doToggleMute(); return false;
   }, this));
   this.elem.on('video:triggerSetVolumeToPercent', $.proxy(function(e, percent) {
-    this.doSetVolumnToPercent(percent); return false;
+    this.doSetVolumeToPercent(percent); return false;
   }, this));
   this.elem.on('video:triggerModVolumeByPercent', $.proxy(function(e, percent) {
     this.doModVolumeByPercent(percent); return false;

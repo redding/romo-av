@@ -278,18 +278,25 @@ RomoVideo.prototype.getVideoPercentInFrames = function(percent) {
 }
 
 RomoVideo.prototype.getVideoFormattedTime = function(seconds) {
-  if (isNaN(parseInt(seconds)) === true){ return '00:00.000'; }
-  else if (seconds === 0){ return '00:00.000'; }
+  if (isNaN(parseInt(seconds)) === true || seconds === 0) {
+    if (this.showMs !== false) {
+      return '00:00.000';
+    } else {
+      return '00:00';
+    }
+  }
 
   var abs  = Math.abs(seconds);
   var hrs  = Math.floor(abs / 3600);
   var mins = Math.floor((abs - (hrs * 3600)) / 60);
   var secs = Math.floor(abs % 60);
-  var ms   = (abs - Math.floor(abs));
 
   var t = (hrs ? hrs + ':' : '') +
           (mins < 10 ? '0' : '') + mins + ':' +
-          (secs < 10 ? '0' : '') + secs + ms.toFixed(3).slice(1);
+          (secs < 10 ? '0' : '') + secs;
+  if (this.showMs !== false) {
+    t += (abs - Math.floor(abs)).toFixed(3).slice(1);
+  }
 
   if (seconds > 0){ return t; }
   else{ return '-'+t; }
@@ -342,6 +349,7 @@ RomoVideo.prototype._loadState = function() {
   } else {
     this.fpsEnabled = false;
   }
+  this.showMs = this.elem.data('romo-video-show-ms');
 }
 
 RomoVideo.prototype._bindFullscreen = function() {

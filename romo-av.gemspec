@@ -20,5 +20,5 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency("assert", ["~> 2.15"])
 
-  gem.add_dependency("romo", ["~> 0.10"])
+  gem.add_dependency("romo", ["~> 0.11"])
 end

@@ -9,6 +9,8 @@ module Romo::Av::Dassets
   # loading this combination.
 
   def self.configure!
+    return if @configured
+
     Dassets.configure do |c|
       c.source Romo::Av.gem_assets_path do |s|
         s.filter{ |paths| paths.reject{ |p| File.basename(p) =~ /^_/ } }
@@ -31,8 +33,11 @@ module Romo::Av::Dassets
         'js/romo-av-audio.js',
         'js/romo-av-video.js'
       ]
-
     end
+
+    @configured = true
   end
+
+  def self.reset!; @configured = false; end
 
 end

@@ -7,7 +7,15 @@ module Romo::Av::Dassets
 
   class UnitTests < Assert::Context
     desc "Romo::Av::Dassets"
+    setup do
+      Romo::Av::Dassets.reset!
+    end
+    teardown do
+      Romo::Av::Dassets.reset!
+    end
     subject{ Romo::Av::Dassets }
+
+    should have_imeths :configure!, :reset!
 
     should "configure Romo::Av with Dassets" do
       subject.configure!
@@ -34,6 +42,23 @@ module Romo::Av::Dassets
         'js/romo-av-video.js'
       ]
       assert_equal exp_js_sources, Dassets.config.combinations['js/romo-av.js']
+    end
+
+    should "only configure itself once unless reset" do
+      subject.configure!
+
+      dassets_call_count = 0
+      Assert.stub(::Dassets, :configure){ dassets_call_count += 1 }
+
+      assert_equal 0, dassets_call_count
+      subject.configure!
+      assert_equal 0, dassets_call_count
+
+      subject.reset!
+
+      assert_equal 0, dassets_call_count
+      subject.configure!
+      assert_equal 1, dassets_call_count
     end
 
   end

@@ -7,16 +7,9 @@ $.fn.romoDropdownVideo = function() {
 var RomoDropdownVideo = function(element) {
   this.elem = $(element);
 
-  this.dropdown = this.elem.romoDropdown()[0];
-  this.doBindDropdown();
-
-  this.video = undefined;
-  this.doBindVideo();
-  this.elem.on('dropdown:loadBodySuccess', $.proxy(function(e, data, dropdown) {
-    this.doBindVideo();
-  }, this));
-
   this.doInit();
+  this._bindElem();
+
   this.elem.trigger('dropdownVideo:ready', [this]);
 }
 
@@ -24,7 +17,20 @@ RomoDropdownVideo.prototype.doInit = function() {
   // override as needed
 }
 
-RomoDropdownVideo.prototype.doBindDropdown = function() {
+// private
+
+RomoDropdownVideo.prototype._bindElem = function() {
+  this._bindDropdown();
+  this._bindVideo();
+
+  this.elem.on('dropdown:loadBodySuccess', $.proxy(function(e, data, dropdown) {
+    this._bindVideo();
+  }, this));
+}
+
+RomoDropdownVideo.prototype._bindDropdown = function() {
+  this.dropdown = this.elem.romoDropdown()[0];
+
   if (this.elem.data('romo-dropdown-clear-content') === undefined) {
     this.elem.attr('data-romo-dropdown-clear-content', 'true');
   }
@@ -82,7 +88,9 @@ RomoDropdownVideo.prototype.doBindDropdown = function() {
   }, this));
 }
 
-RomoDropdownVideo.prototype.doBindVideo = function() {
+RomoDropdownVideo.prototype._bindVideo = function() {
+  this.video = undefined;
+
   var videoElem = this.dropdown.popupElem.find('[data-romo-video-auto="dropdownVideo"]');
 
   this._bindVideoElemEvents(videoElem);
@@ -90,8 +98,6 @@ RomoDropdownVideo.prototype.doBindVideo = function() {
 
   this.video = videoElem.romoVideo()[0];
 }
-
-// private
 
 RomoDropdownVideo.prototype._bindVideoElemEvents = function(videoElem) {
   // playback events

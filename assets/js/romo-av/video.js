@@ -5,21 +5,10 @@ $.fn.romoVideo = function() {
 }
 
 var RomoVideo = function(element) {
-  this.elem     = $(element);
-  this.videoObj = this.elem[0];
-
-  this._bindFullscreen();
-  this._bindVideo();
+  this.elem = $(element);
 
   this.doInit();
-  this._loadState();
-
-  this.durationTime   = undefined;
-  this.durationFrames = undefined;
-  this.elem.on('loadedmetadata', $.proxy(function(e) {
-    this.durationTime   = this.getDurationTime();
-    this.durationFrames = this.getDurationFrames();
-  }, this));
+  this._bindElem()
 
   this.elem.trigger('video:ready', [this.video, this]);
 }
@@ -304,74 +293,20 @@ RomoVideo.prototype.getVideoFormattedTime = function(seconds) {
 
 // private
 
-RomoVideo.prototype._setPlayback = function(newSecondNum) {
-  var durationTime = this.getDurationTime();
-  if (newSecondNum > durationTime) {
-    if (this.elem.prop('loop') === true){
-      this.videoObj.currentTime = newSecondNum - durationTime;
-    } else {
-      this.videoObj.currentTime = durationTime;
-    }
-  } else if (newSecondNum < 0) {
-    if (this.elem.prop('loop') === true){
-      this.videoObj.currentTime = (durationTime - (0 - newSecondNum));
-    } else {
-      this.videoObj.currentTime = 0;
-    }
-  } else {
-    this.videoObj.currentTime = newSecondNum;
-  }
-}
+RomoVideo.prototype._bindElem = function() {
+  this.videoObj = this.elem[0];
 
-RomoVideo.prototype._frameNumToSecondNum = function(frameNum) {
-  return frameNum / this.fps;
-}
+  this.durationTime   = undefined;
+  this.durationFrames = undefined;
+  this.elem.on('loadedmetadata', $.proxy(function(e) {
+    this.durationTime   = this.getDurationTime();
+    this.durationFrames = this.getDurationFrames();
+  }, this));
 
-RomoVideo.prototype._percentToSecondNum = function(percent) {
-  return (percent / 100) * this.getDurationTime();
-}
-
-RomoVideo.prototype._setVolume = function(value) {
-  if (value > 1) {
-    this.videoObj.volume = 1;
-  } else if (value < 0) {
-    this.videoObj.volume = 0;
-  } else {
-    this.videoObj.volume = value;
-  }
-  this.doUnmute();
-}
-
-RomoVideo.prototype._loadState = function() {
-  this.fps = this.elem.data('romo-video-fps');
-  if (this.fps && this.fps > 0) {
-    this.fpsEnabled = true;
-  } else {
-    this.fpsEnabled = false;
-  }
-  this.showMs = this.elem.data('romo-video-show-ms');
-}
-
-RomoVideo.prototype._bindFullscreen = function() {
-  var fullscreenElem = this.elem.closest(this.elem.data('romo-video-fullscreen-elem'));
-  if (fullscreenElem[0] !== undefined) {
-    this.fullscreenElem = fullscreenElem;
-  } else {
-    this.fullscreenElem = this.elem;
-  }
-
-  this._browserRequestFullscreen = this._getBrowserRequestFullscreen(this.fullscreenElem);
-  this._browserExitFullscreen    = this._getBrowserExitFullscreen();
-
-  $(document).on('fullscreenchange',       $.proxy(this._onDocumentFullscreenChange, this));
-  $(document).on('mozfullscreenchange',    $.proxy(this._onDocumentFullscreenChange, this));
-  $(document).on('msfullscreenchange',     $.proxy(this._onDocumentFullscreenChange, this));
-  $(document).on('webkitfullscreenchange', $.proxy(this._onDocumentFullscreenChange, this));
-}
-
-RomoVideo.prototype._bindVideo = function() {
+  this._bindFullscreen();
   this._bindVideoElemEvents();
   this._bindVideoTriggerEvents();
+  this._loadState();
 }
 
 RomoVideo.prototype._bindVideoElemEvents = function() {
@@ -524,6 +459,71 @@ RomoVideo.prototype._bindVideoTriggerEvents = function() {
     this.doModSource(source); return false;
   }, this));
 
+}
+
+RomoVideo.prototype._bindFullscreen = function() {
+  var fullscreenElem = this.elem.closest(this.elem.data('romo-video-fullscreen-elem'));
+  if (fullscreenElem[0] !== undefined) {
+    this.fullscreenElem = fullscreenElem;
+  } else {
+    this.fullscreenElem = this.elem;
+  }
+
+  this._browserRequestFullscreen = this._getBrowserRequestFullscreen(this.fullscreenElem);
+  this._browserExitFullscreen    = this._getBrowserExitFullscreen();
+
+  $(document).on('fullscreenchange',       $.proxy(this._onDocumentFullscreenChange, this));
+  $(document).on('mozfullscreenchange',    $.proxy(this._onDocumentFullscreenChange, this));
+  $(document).on('msfullscreenchange',     $.proxy(this._onDocumentFullscreenChange, this));
+  $(document).on('webkitfullscreenchange', $.proxy(this._onDocumentFullscreenChange, this));
+}
+
+RomoVideo.prototype._loadState = function() {
+  this.fps = this.elem.data('romo-video-fps');
+  if (this.fps && this.fps > 0) {
+    this.fpsEnabled = true;
+  } else {
+    this.fpsEnabled = false;
+  }
+  this.showMs = this.elem.data('romo-video-show-ms');
+}
+
+RomoVideo.prototype._setPlayback = function(newSecondNum) {
+  var durationTime = this.getDurationTime();
+  if (newSecondNum > durationTime) {
+    if (this.elem.prop('loop') === true){
+      this.videoObj.currentTime = newSecondNum - durationTime;
+    } else {
+      this.videoObj.currentTime = durationTime;
+    }
+  } else if (newSecondNum < 0) {
+    if (this.elem.prop('loop') === true){
+      this.videoObj.currentTime = (durationTime - (0 - newSecondNum));
+    } else {
+      this.videoObj.currentTime = 0;
+    }
+  } else {
+    this.videoObj.currentTime = newSecondNum;
+  }
+}
+
+RomoVideo.prototype._frameNumToSecondNum = function(frameNum) {
+  return frameNum / this.fps;
+}
+
+RomoVideo.prototype._percentToSecondNum = function(percent) {
+  return (percent / 100) * this.getDurationTime();
+}
+
+RomoVideo.prototype._setVolume = function(value) {
+  if (value > 1) {
+    this.videoObj.volume = 1;
+  } else if (value < 0) {
+    this.videoObj.volume = 0;
+  } else {
+    this.videoObj.volume = value;
+  }
+  this.doUnmute();
 }
 
 RomoVideo.prototype._onDocumentFullscreenChange = function(e) {

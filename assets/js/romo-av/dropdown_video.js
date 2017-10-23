@@ -10,7 +10,7 @@ var RomoDropdownVideo = function(element) {
   this.doInit();
   this._bindElem();
 
-  this.elem.trigger('dropdownVideo:ready', [this]);
+  this.elem.trigger('romoDropdownVideo:ready', [this]);
 }
 
 RomoDropdownVideo.prototype.doInit = function() {
@@ -23,13 +23,13 @@ RomoDropdownVideo.prototype._bindElem = function() {
   this._bindDropdown();
   this._bindVideo();
 
-  this.elem.on('dropdown:loadBodySuccess', $.proxy(function(e, data, dropdown) {
+  this.elem.on('romoDropdown:loadBodySuccess', $.proxy(function(e, data, romoDropdown) {
     this._bindVideo();
   }, this));
 }
 
 RomoDropdownVideo.prototype._bindDropdown = function() {
-  this.dropdown = this.elem.romoDropdown()[0];
+  this.romoDropdown = this.elem.romoDropdown()[0];
 
   if (this.elem.data('romo-dropdown-clear-content') === undefined) {
     this.elem.attr('data-romo-dropdown-clear-content', 'true');
@@ -37,269 +37,269 @@ RomoDropdownVideo.prototype._bindDropdown = function() {
 
   // dropdown/video interactions
 
-  this.elem.on('dropdownVideo:video:loadedmetadata', $.proxy(function(e, videoObj, video, dropdownVideo) {
-    this.dropdown.doPlacePopupElem();
+  this.elem.on('romoDropdownVideo:romoVideo:loadedmetadata', $.proxy(function(e, videoObj, romoVideo, romoDropdownVideo) {
+    this.romoDropdown.doPlacePopupElem();
   }, this));
 
-  this.elem.on('dropdownVideo:video:enterFullscreen', $.proxy(function(e, videoObj, video, dropdownVideo) {
+  this.elem.on('romoDropdownVideo:romoVideo:enterFullscreen', $.proxy(function(e, videoObj, romoVideo, romoDropdownVideo) {
     // wait 1 sec then turn off dropdown body elem events - since we are in fullscreen
     // mode, we don't care about them
     setTimeout($.proxy(function() {
-      this.dropdown.doUnBindWindowBodyClick();
-      this.dropdown.doUnBindWindowBodyKeyUp();
-      this.dropdown.doUnBindElemKeyUp();
+      this.romoDropdown.doUnBindWindowBodyClick();
+      this.romoDropdown.doUnBindWindowBodyKeyUp();
+      this.romoDropdown.doUnBindElemKeyUp();
     }, this), 1000);
   }, this));
-  this.elem.on('dropdownVideo:video:exitFullscreen', $.proxy(function(e, videoObj, video, dropdownVideo) {
+  this.elem.on('romoDropdownVideo:romoVideo:exitFullscreen', $.proxy(function(e, videoObj, romoVideo, romoDropdownVideo) {
     // wait 1 sec then turn on dropdown body elem events - since we are no longer
     // in fullscreen mode, we need to care about them again
     setTimeout($.proxy(function() {
-      this.dropdown.doBindWindowBodyClick();
-      this.dropdown.doBindWindowBodyKeyUp();
-      this.dropdown.doBindElemKeyUp();
+      this.romoDropdown.doBindWindowBodyClick();
+      this.romoDropdown.doBindWindowBodyKeyUp();
+      this.romoDropdown.doBindElemKeyUp();
     }, this), 1000);
   }, this));
 
   // event proxies
 
-  this.elem.on('dropdown:ready', $.proxy(function(e, dropdown) {
-    this.elem.trigger('dropdownVideo:dropdown:ready', [dropdown, this]);
+  this.elem.on('romoDropdown:ready', $.proxy(function(e, romoDropdown) {
+    this.elem.trigger('romoDropdownVideo:romoDropdown:ready', [romoDropdown, this]);
   }, this));
-  this.elem.on('dropdown:toggle', $.proxy(function(e, dropdown) {
-    this.elem.trigger('dropdownVideo:dropdown:toggle', [dropdown, this]);
+  this.elem.on('romoDropdown:toggle', $.proxy(function(e, romoDropdown) {
+    this.elem.trigger('romoDropdownVideo:romoDropdown:toggle', [romoDropdown, this]);
   }, this));
-  this.elem.on('dropdown:popupOpen', $.proxy(function(e, dropdown) {
-    this.elem.trigger('dropdownVideo:dropdown:popupOpen', [dropdown, this]);
+  this.elem.on('romoDropdown:popupOpen', $.proxy(function(e, romoDropdown) {
+    this.elem.trigger('romoDropdownVideo:romoDropdown:popupOpen', [romoDropdown, this]);
   }, this));
-  this.elem.on('dropdown:popupClose', $.proxy(function(e, dropdown) {
-    this.elem.trigger('dropdownVideo:dropdown:popupClose', [dropdown, this]);
+  this.elem.on('romoDropdown:popupClose', $.proxy(function(e, romoDropdown) {
+    this.elem.trigger('romoDropdownVideo:romoDropdown:popupClose', [romoDropdown, this]);
   }, this));
-  this.elem.on('dropdown:loadBodyStart', $.proxy(function(e, dropdown) {
-    this.elem.trigger('dropdownVideo:dropdown:loadBodyStart', [dropdown, this]);
+  this.elem.on('romoDropdown:loadBodyStart', $.proxy(function(e, romoDropdown) {
+    this.elem.trigger('romoDropdownVideo:romoDropdown:loadBodyStart', [romoDropdown, this]);
   }, this));
-  this.elem.on('dropdown:loadBodySuccess', $.proxy(function(e, data, dropdown) {
-    this.elem.trigger('dropdownVideo:dropdown:loadBodySuccess', [data, dropdown, this]);
+  this.elem.on('romoDropdown:loadBodySuccess', $.proxy(function(e, data, romoDropdown) {
+    this.elem.trigger('romoDropdownVideo:romoDropdown:loadBodySuccess', [data, romoDropdown, this]);
   }, this));
-  this.elem.on('dropdown:loadBodyError', $.proxy(function(e, xhr, dropdown) {
-    this.elem.trigger('dropdownVideo:dropdown:loadBodyError', [xhr, dropdown, this]);
+  this.elem.on('romoDropdown:loadBodyError', $.proxy(function(e, xhr, romoDropdown) {
+    this.elem.trigger('romoDropdownVideo:romoDropdown:loadBodyError', [xhr, romoDropdown, this]);
   }, this));
-  this.elem.on('dropdown:dismiss', $.proxy(function(e, dropdown) {
-    this.elem.trigger('dropdownVideo:dropdown:dismiss', [dropdown, this]);
+  this.elem.on('romoDropdown:dismiss', $.proxy(function(e, romoDropdown) {
+    this.elem.trigger('romoDropdownVideo:romoDropdown:dismiss', [romoDropdown, this]);
   }, this));
 }
 
 RomoDropdownVideo.prototype._bindVideo = function() {
-  this.video = undefined;
+  this.romoVideo = undefined;
 
-  var videoElem = this.dropdown.popupElem.find('[data-romo-video-auto="dropdownVideo"]');
+  var videoElem = this.romoDropdown.popupElem.find('[data-romo-video-auto="dropdownVideo"]');
 
   this._bindVideoElemEvents(videoElem);
   this._bindDropdownVideoTriggerEvents();
 
-  this.video = videoElem.romoVideo()[0];
+  this.romoVideo = videoElem.romoVideo()[0];
 }
 
 RomoDropdownVideo.prototype._bindVideoElemEvents = function(videoElem) {
   // playback events
 
-  videoElem.on('video:play', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:play', [videoObj, video, this]);
+  videoElem.on('romoVideo:play', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:play', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:pause', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:pause', [videoObj, video, this]);
+  videoElem.on('romoVideo:pause', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:pause', [videoObj, romoVideo, this]);
   }, this));
 
   // state events
 
-  videoElem.on('video:playing', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:playing', [videoObj, video, this]);
+  videoElem.on('romoVideo:playing', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:playing', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:waiting', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:waiting', [videoObj, video, this]);
+  videoElem.on('romoVideo:waiting', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:waiting', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:ended',  $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:ended', [videoObj, video, this]);
+  videoElem.on('romoVideo:ended',  $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:ended', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:emptied', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:emptied', [videoObj, video, this]);
+  videoElem.on('romoVideo:emptied', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:emptied', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:error', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:error', [videoObj, video, this]);
+  videoElem.on('romoVideo:error', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:error', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:stalled', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:stalled', [videoObj, video, this]);
+  videoElem.on('romoVideo:stalled', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:stalled', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:suspend', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:suspend', [videoObj, video, this]);
+  videoElem.on('romoVideo:suspend', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:suspend', [videoObj, romoVideo, this]);
   }, this));
 
   // status events
 
-  videoElem.on('video:progress', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:progress', [videoObj, video, this]);
+  videoElem.on('romoVideo:progress', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:progress', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:timeupdate', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:timeupdate', [videoObj, video, this]);
+  videoElem.on('romoVideo:timeupdate', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:timeupdate', [videoObj, romoVideo, this]);
   }, this));
 
   // settings events
 
-  videoElem.on('video:volumechange', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:volumechange', [videoObj, video, this]);
+  videoElem.on('romoVideo:volumechange', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:volumechange', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:durationchange', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:durationchange', [videoObj, video, this]);
+  videoElem.on('romoVideo:durationchange', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:durationchange', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:ratechange', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:ratechange', [videoObj, video, this]);
+  videoElem.on('romoVideo:ratechange', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:ratechange', [videoObj, romoVideo, this]);
   }, this));
 
   // fullscreen events
 
-  videoElem.on('video:enterFullscreen', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:enterFullscreen', [videoObj, video, this]);
+  videoElem.on('romoVideo:enterFullscreen', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:enterFullscreen', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:exitFullscreen', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:exitFullscreen', [videoObj, video, this]);
+  videoElem.on('romoVideo:exitFullscreen', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:exitFullscreen', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:fullscreenChange', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:fullscreenChange', [videoObj, video, this]);
+  videoElem.on('romoVideo:fullscreenChange', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:fullscreenChange', [videoObj, romoVideo, this]);
   }, this));
 
   // load events
 
-  videoElem.on('video:loadstart', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:loadstart', [videoObj, video, this]);
+  videoElem.on('romoVideo:loadstart', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:loadstart', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:loadedmetadata', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:loadedmetadata', [videoObj, video, this]);
+  videoElem.on('romoVideo:loadedmetadata', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:loadedmetadata', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:loadeddata', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:loadeddata', [videoObj, video, this]);
+  videoElem.on('romoVideo:loadeddata', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:loadeddata', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:canplay', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:canplay', [videoObj, video, this]);
+  videoElem.on('romoVideo:canplay', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:canplay', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:canplaythrough', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('dropdownVideo:video:canplaythrough', [videoObj, video, this]);
+  videoElem.on('romoVideo:canplaythrough', $.proxy(function(e, videoObj, romoVideo) {
+    this.elem.trigger('romoDropdownVideo:romoVideo:canplaythrough', [videoObj, romoVideo, this]);
   }, this));
 }
 
 RomoDropdownVideo.prototype._bindDropdownVideoTriggerEvents = function() {
   // playback triggers
 
-  this.elem.on('dropdownVideo:video:triggerPlay', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerPlay', []);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerPlay', $.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerPlay', []);
     }
   }, this));
-  this.elem.on('dropdownVideo:video:triggerPause', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerPause', []);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerPause', $.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerPause', []);
     }
   }, this));
-  this.elem.on('dropdownVideo:video:triggerTogglePlay', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerTogglePlay', []);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerTogglePlay', $.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerTogglePlay', []);
     }
   }, this));
-  this.elem.on('dropdownVideo:video:triggerSetPlaybackToTime', $.proxy(function(e, secondNum) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerSetPlaybackToTime', [secondNum]);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerSetPlaybackToTime', $.proxy(function(e, secondNum) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerSetPlaybackToTime', [secondNum]);
     }
   }, this));
-  this.elem.on('dropdownVideo:video:triggerSetPlaybackToFrame', $.proxy(function(e, frameNum) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerSetPlaybackToFrame', [frameNum]);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerSetPlaybackToFrame', $.proxy(function(e, frameNum) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerSetPlaybackToFrame', [frameNum]);
     }
   }, this));
-  this.elem.on('dropdownVideo:video:triggerSetPlaybackToPercent', $.proxy(function(e, percent) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerSetPlaybackToPercent', [percent]);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerSetPlaybackToPercent', $.proxy(function(e, percent) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerSetPlaybackToPercent', [percent]);
     }
   }, this));
-  this.elem.on('dropdownVideo:video:triggerModPlaybackByTime', $.proxy(function(e, secondsCount) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerModPlaybackByTime', [secondsCount]);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerModPlaybackByTime', $.proxy(function(e, secondsCount) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerModPlaybackByTime', [secondsCount]);
     }
   }, this));
-  this.elem.on('dropdownVideo:video:triggerModPlaybackByFrames', $.proxy(function(e, frameCount) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerModPlaybackByFrames', [frameCount]);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerModPlaybackByFrames', $.proxy(function(e, frameCount) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerModPlaybackByFrames', [frameCount]);
     }
   }, this));
-  this.elem.on('dropdownVideo:video:triggerModPlaybackByPercent', $.proxy(function(e, percent) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerModPlaybackByPercent', [percent]);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerModPlaybackByPercent', $.proxy(function(e, percent) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerModPlaybackByPercent', [percent]);
     }
   }, this));
 
   // settings triggers
 
-  this.elem.on('dropdownVideo:video:triggerMute', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerMute', []);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerMute', $.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerMute', []);
     }
   }, this));
-  this.elem.on('dropdownVideo:video:triggerUnmute', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerUnmute', []);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerUnmute', $.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerUnmute', []);
     }
   }, this));
-  this.elem.on('dropdownVideo:video:triggerToggleMute', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerToggleMute', []);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerToggleMute', $.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerToggleMute', []);
     }
   }, this));
-  this.elem.on('dropdownVideo:video:triggerSetVolumeToPercent', $.proxy(function(e, percent) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerSetVolumeToPercent', [percent]);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerSetVolumeToPercent', $.proxy(function(e, percent) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerSetVolumeToPercent', [percent]);
     }
   }, this));
-  this.elem.on('dropdownVideo:video:triggerModVolumeByPercent', $.proxy(function(e, percent) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerModVolumeByPercent', [percent]);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerModVolumeByPercent', $.proxy(function(e, percent) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerModVolumeByPercent', [percent]);
     }
   }, this));
-  this.elem.on('dropdownVideo:video:triggerSetPlaybackRate', $.proxy(function(e, rate) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerSetPlaybackRate', [rate]);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerSetPlaybackRate', $.proxy(function(e, rate) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerSetPlaybackRate', [rate]);
     }
   }, this));
-  this.elem.on('dropdownVideo:video:triggerModPlaybackRate', $.proxy(function(e, rate) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerModPlaybackRate', [rate]);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerModPlaybackRate', $.proxy(function(e, rate) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerModPlaybackRate', [rate]);
     }
   }, this));
 
   // fullscreen triggers
 
-  this.elem.on('dropdownVideo:video:triggerEnterFullscreen', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerEnterFullscreen', []);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerEnterFullscreen', $.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerEnterFullscreen', []);
     }
   }, this));
-  this.elem.on('dropdownVideo:video:triggerExitFullscreen', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerExitFullscreen', []);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerExitFullscreen', $.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerExitFullscreen', []);
     }
   }, this));
-  this.elem.on('dropdownVideo:video:triggerToggleFullscreen', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerToggleFullscreen', []);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerToggleFullscreen', $.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerToggleFullscreen', []);
     }
   }, this));
 
   // load triggers
 
-  this.elem.on('dropdownVideo:video:triggerLoad', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerLoad', []);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerLoad', $.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerLoad', []);
     }
   }, this));
-  this.elem.on('dropdownVideo:video:triggerModSource', $.proxy(function(e, source) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerModSource', [source]);
+  this.elem.on('romoDropdownVideo:romoVideo:triggerModSource', $.proxy(function(e, source) {
+    if (this.romoVideo != undefined) {
+      this.romoVideo.elem.trigger('romoVideo:triggerModSource', [source]);
     }
   }, this));
 }

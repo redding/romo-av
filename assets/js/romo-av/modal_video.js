@@ -7,16 +7,9 @@ $.fn.romoModalVideo = function() {
 var RomoModalVideo = function(element) {
   this.elem = $(element);
 
-  this.modal = this.elem.romoModal()[0];
-  this.doBindModal();
-
-  this.video = undefined;
-  this.doBindVideo();
-  this.elem.on('modal:loadBodySuccess', $.proxy(function(e, data, modal) {
-    this.doBindVideo();
-  }, this));
-
   this.doInit();
+  this._bindElem();
+
   this.elem.trigger('modalVideo:ready', [this]);
 }
 
@@ -24,7 +17,20 @@ RomoModalVideo.prototype.doInit = function() {
   // override as needed
 }
 
-RomoModalVideo.prototype.doBindModal = function() {
+// private
+
+RomoModalVideo.prototype._bindElem = function() {
+  this._bindModal();
+  this._bindVideo();
+
+  this.elem.on('modal:loadBodySuccess', $.proxy(function(e, data, modal) {
+    this._bindVideo();
+  }, this));
+}
+
+RomoModalVideo.prototype._bindModal = function() {
+  this.modal = this.elem.romoModal()[0];
+
   if (this.elem.data('romo-modal-clear-content') === undefined) {
     this.elem.attr('data-romo-modal-clear-content', 'true');
   }
@@ -91,7 +97,9 @@ RomoModalVideo.prototype.doBindModal = function() {
   }, this));
 }
 
-RomoModalVideo.prototype.doBindVideo = function() {
+RomoModalVideo.prototype._bindVideo = function() {
+  this.video = undefined;
+
   var videoElem = this.modal.popupElem.find('[data-romo-video-auto="modalVideo"]');
 
   this._bindVideoElemEvents(videoElem);
@@ -99,8 +107,6 @@ RomoModalVideo.prototype.doBindVideo = function() {
 
   this.video = videoElem.romoVideo()[0];
 }
-
-// private
 
 RomoModalVideo.prototype._bindVideoElemEvents = function(videoElem) {
   // playback events

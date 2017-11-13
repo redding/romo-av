@@ -1,15 +1,11 @@
-var RomoDropdownVideo = function(elem) {
+var RomoDropdownVideo = RomoComponent(function(elem) {
   this.elem = elem;
 
   this.doInit();
   this._bindElem();
 
   this.elem.trigger('romoDropdownVideo:ready', [this]);
-}
-
-RomoDropdownVideo.prototype.doInit = function() {
-  // override as needed
-}
+});
 
 // private
 
@@ -299,6 +295,6 @@ RomoDropdownVideo.prototype._bindDropdownVideoTriggerEvents = function() {
   }, this));
 }
 
-Romo.onInitUI(function(elem) {
-  Romo.initUIElems(elem, '[data-romo-dropdownVideo-auto="true"]').forEach(function(elem) { new RomoDropdownVideo(elem); });
-});
+// init
+
+Romo.addElemsInitSelector('[data-romo-dropdownVideo-auto="true"]', RomoDropdownVideo);

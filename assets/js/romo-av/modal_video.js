@@ -1,15 +1,11 @@
-var RomoModalVideo = function(elem) {
+var RomoModalVideo = RomoComponent(function(elem) {
   this.elem = elem;
 
   this.doInit();
   this._bindElem();
 
   this.elem.trigger('romoModalVideo:ready', [this]);
-}
-
-RomoModalVideo.prototype.doInit = function() {
-  // override as needed
-}
+});
 
 // private
 
@@ -308,6 +304,6 @@ RomoModalVideo.prototype._bindModalVideoTriggerEvents = function() {
   }, this));
 }
 
-Romo.onInitUI(function(elem) {
-  Romo.initUIElems(elem, '[data-romo-modalVideo-auto="true"]').forEach(function(elem) { new RomoModalVideo(elem); });
-});
+// init
+
+Romo.addElemsInitSelector('[data-romo-modalVideo-auto="true"]', RomoModalVideo);

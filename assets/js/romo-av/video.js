@@ -1,15 +1,11 @@
-var RomoVideo = function(elem) {
+var RomoVideo = RomoComponent(function(elem) {
   this.elem = elem;
 
   this.doInit();
   this._bindElem()
 
   Romo.trigger(this.elem, 'romoVideo:ready', [this.videoObj, this]);
-}
-
-RomoVideo.prototype.doInit = function() {
-  // override as needed
-}
+});
 
 // Playback methods
 
@@ -520,18 +516,6 @@ RomoVideo.prototype._setVolume = function(value) {
   this.doUnmute();
 }
 
-RomoVideo.prototype._onDocumentFullscreenChange = function(e) {
-  if (this._getCurrentFullscreenElem() === this.fullscreenElem) {
-    this.fullScreen = true;
-    Romo.trigger(this.elem, 'romoVideo:enterFullscreen',  [this.videoObj, this]);
-    Romo.trigger(this.elem, 'romoVideo:fullscreenChange', [this.videoObj, this]);
-  } else if (this.fullScreen === true) {
-    this.fullScreen = false;
-    Romo.trigger(this.elem, 'romoVideo:exitFullscreen',   [this.videoObj, this]);
-    Romo.trigger(this.elem, 'romoVideo:fullscreenChange', [this.videoObj, this]);
-  }
-}
-
 RomoVideo.prototype._getCurrentFullscreenElem = function() {
   return document.fullscreenElement        ||
          document.mozFullScreenElement     ||
@@ -608,6 +592,20 @@ RomoVideo.prototype._getBrowserExitFullscreen = function(fullscreenElem) {
   }
 }
 
-Romo.onInitUI(function(elem) {
-  Romo.initUIElems(elem, '[data-romo-video-auto="true"]').forEach(function(elem) { new RomoVideo(elem); });
-});
+// event functions
+
+RomoVideo.prototype.romoEvFn._onDocumentFullscreenChange = function(e) {
+  if (this._getCurrentFullscreenElem() === this.fullscreenElem) {
+    this.fullScreen = true;
+    Romo.trigger(this.elem, 'romoVideo:enterFullscreen',  [this.videoObj, this]);
+    Romo.trigger(this.elem, 'romoVideo:fullscreenChange', [this.videoObj, this]);
+  } else if (this.fullScreen === true) {
+    this.fullScreen = false;
+    Romo.trigger(this.elem, 'romoVideo:exitFullscreen',   [this.videoObj, this]);
+    Romo.trigger(this.elem, 'romoVideo:fullscreenChange', [this.videoObj, this]);
+  }
+}
+
+// init
+
+Romo.addElemsInitSelector('[data-romo-video-auto="true"]', RomoVideo);

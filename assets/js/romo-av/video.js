@@ -1,5 +1,6 @@
 var RomoVideo = RomoComponent(function(elem) {
-  this.elem = elem;
+  this.elem     = elem;
+  this.videoObj = this.elem;
 
   this.doInit();
   this._bindElem()
@@ -284,8 +285,6 @@ RomoVideo.prototype.getVideoFormattedTime = function(seconds) {
 // private
 
 RomoVideo.prototype._bindElem = function() {
-  this.videoObj = this.elem;
-
   this.durationTime   = undefined;
   this.durationFrames = undefined;
   Romo.on(this.elem, 'loadedmetadata', Romo.proxy(function(e) {

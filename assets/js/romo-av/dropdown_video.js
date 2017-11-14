@@ -4,7 +4,7 @@ var RomoDropdownVideo = RomoComponent(function(elem) {
   this.doInit();
   this._bindElem();
 
-  this.elem.trigger('romoDropdownVideo:ready', [this]);
+  Romo.trigger(this.elem, 'romoDropdownVideo:ready', [this]);
 });
 
 // private
@@ -108,7 +108,7 @@ RomoDropdownVideo.prototype._bindVideoElemEvents = function(videoElem) {
   Romo.on(videoElem, 'romoVideo:waiting', Romo.proxy(function(e, videoObj, romoVideo) {
     Romo.trigger(this.elem, 'romoDropdownVideo:romoVideo:waiting', [videoObj, romoVideo, this]);
   }, this));
-  Romo.on(videoElem, 'romoVideo:ended', Romo$.proxy(function(e, videoObj, romoVideo) {
+  Romo.on(videoElem, 'romoVideo:ended', Romo.proxy(function(e, videoObj, romoVideo) {
     Romo.trigger(this.elem, 'romoDropdownVideo:romoVideo:ended', [videoObj, romoVideo, this]);
   }, this));
   Romo.on(videoElem, 'romoVideo:emptied', Romo.proxy(function(e, videoObj, romoVideo) {

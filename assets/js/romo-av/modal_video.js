@@ -31,25 +31,6 @@ RomoModalVideo.prototype._bindModal = function() {
     this.romoModal.doPlacePopupElem();
   }, this));
 
-  Romo.on(this.elem, 'romoModalVideo:romoVideo:enterFullscreen', Romo.proxy(function(e, videoObj, romoVideo, romoModalVideo) {
-    // wait 1 sec then turn off modal body elem events - since we are in fullscreen
-    // mode, we don't care about them
-    setTimeout(Romo.proxy(function() {
-      this.romoModal.doUnBindWindowBodyClick();
-      this.romoModal.doUnBindWindowBodyKeyUp();
-      this.romoModal.doUnBindElemKeyUp();
-    }, this), 1000);
-  }, this));
-  Romo.on(this.elem, 'romoModalVideo:romoVideo:exitFullscreen', Romo.proxy(function(e, videoObj, romoVideo, romoModalVideo) {
-    // wait 1 sec then turn on modal body elem events - since we are no longer
-    // in fullscreen mode, we need to care about them again
-    setTimeout(Romo.proxy(function() {
-      this.romoModal.doBindWindowBodyClick();
-      this.romoModal.doBindWindowBodyKeyUp();
-      this.romoModal.doBindElemKeyUp();
-    }, this), 1000);
-  }, this));
-
   // event proxies
 
   Romo.on(this.elem, 'romoModal:ready', Romo.proxy(function(e, romoModal) {

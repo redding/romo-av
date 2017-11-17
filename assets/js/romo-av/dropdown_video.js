@@ -31,25 +31,6 @@ RomoDropdownVideo.prototype._bindDropdown = function() {
     this.romoDropdown.doPlacePopupElem();
   }, this));
 
-  Romo.on(this.elem, 'romoDropdownVideo:romoVideo:enterFullscreen', Romo.proxy(function(e, videoObj, romoVideo, romoDropdownVideo) {
-    // wait 1 sec then turn off dropdown body elem events - since we are in fullscreen
-    // mode, we don't care about them
-    setTimeout(Romo.proxy(function() {
-      this.romoDropdown.doUnBindWindowBodyClick();
-      this.romoDropdown.doUnBindWindowBodyKeyUp();
-      this.romoDropdown.doUnBindElemKeyUp();
-    }, this), 1000);
-  }, this));
-  Romo.on(this.elem, 'romoDropdownVideo:romoVideo:exitFullscreen', Romo.proxy(function(e, videoObj, romoVideo, romoDropdownVideo) {
-    // wait 1 sec then turn on dropdown body elem events - since we are no longer
-    // in fullscreen mode, we need to care about them again
-    setTimeout(Romo.proxy(function() {
-      this.romoDropdown.doBindWindowBodyClick();
-      this.romoDropdown.doBindWindowBodyKeyUp();
-      this.romoDropdown.doBindElemKeyUp();
-    }, this), 1000);
-  }, this));
-
   // event proxies
 
   Romo.on(this.elem, 'romoDropdown:ready', Romo.proxy(function(e, romoDropdown) {

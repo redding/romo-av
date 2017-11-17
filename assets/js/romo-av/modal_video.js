@@ -1,312 +1,290 @@
-$.fn.romoModalVideo = function() {
-  return $.map(this, function(element) {
-    return new RomoModalVideo(element);
-  });
-}
-
-var RomoModalVideo = function(element) {
-  this.elem = $(element);
-
-  this.modal = this.elem.romoModal()[0];
-  this.doBindModal();
-
-  this.video = undefined;
-  this.doBindVideo();
-  this.elem.on('modal:loadBodySuccess', $.proxy(function(e, data, modal) {
-    this.doBindVideo();
-  }, this));
+var RomoModalVideo = RomoComponent(function(elem) {
+  this.elem = elem;
 
   this.doInit();
-  this.elem.trigger('modalVideo:ready', [this]);
+  this._bindElem();
+
+  Romo.trigger(this.elem, 'romoModalVideo:ready', [this]);
+});
+
+// private
+
+RomoModalVideo.prototype._bindElem = function() {
+  this._bindModal();
+  this._bindVideo();
+
+  Romo.on(this.elem, 'romoModal:loadBodySuccess', Romo.proxy(function(e, data, romoModal) {
+    this._bindVideo();
+  }, this));
 }
 
-RomoModalVideo.prototype.doInit = function() {
-  // override as needed
-}
-
-RomoModalVideo.prototype.doBindModal = function() {
-  if (this.elem.data('romo-modal-clear-content') === undefined) {
-    this.elem.attr('data-romo-modal-clear-content', 'true');
+RomoModalVideo.prototype._bindModal = function() {
+  if (Romo.data(this.elem, 'romo-modal-clear-content') === undefined) {
+    Romo.setData(this.elem, 'romo-modal-clear-content', 'true');
   }
+
+  this.romoModal = new RomoModal(this.elem);
 
   // modal/video interactions
 
-  this.elem.on('modalVideo:video:loadedmetadata', $.proxy(function(e, videoObj, video, modalVideo) {
-    this.modal.doPlacePopupElem();
-  }, this));
-
-  this.elem.on('modalVideo:video:enterFullscreen', $.proxy(function(e, videoObj, video, modalVideo) {
-    // wait 1 sec then turn off modal body elem events - since we are in fullscreen
-    // mode, we don't care about them
-    setTimeout($.proxy(function() {
-      this.modal.doUnBindWindowBodyClick();
-      this.modal.doUnBindWindowBodyKeyUp();
-      this.modal.doUnBindElemKeyUp();
-    }, this), 1000);
-  }, this));
-  this.elem.on('modalVideo:video:exitFullscreen', $.proxy(function(e, videoObj, video, modalVideo) {
-    // wait 1 sec then turn on modal body elem events - since we are no longer
-    // in fullscreen mode, we need to care about them again
-    setTimeout($.proxy(function() {
-      this.modal.doBindWindowBodyClick();
-      this.modal.doBindWindowBodyKeyUp();
-      this.modal.doBindElemKeyUp();
-    }, this), 1000);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:loadedmetadata', Romo.proxy(function(e, videoObj, romoVideo, romoModalVideo) {
+    this.romoModal.doPlacePopupElem();
   }, this));
 
   // event proxies
 
-  this.elem.on('modal:ready', $.proxy(function(e, modal) {
-    this.elem.trigger('modalVideo:modal:ready', [modal, this]);
+  Romo.on(this.elem, 'romoModal:ready', Romo.proxy(function(e, romoModal) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoModal:ready', [romoModal, this]);
   }, this));
-  this.elem.on('modal:toggle', $.proxy(function(e, modal) {
-    this.elem.trigger('modalVideo:modal:toggle', [modal, this]);
+  Romo.on(this.elem, 'romoModal:toggle', Romo.proxy(function(e, romoModal) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoModal:toggle', [romoModal, this]);
   }, this));
-  this.elem.on('modal:popupOpen', $.proxy(function(e, modal) {
-    this.elem.trigger('modalVideo:modal:popupOpen', [modal, this]);
+  Romo.on(this.elem, 'romoModal:popupOpen', Romo.proxy(function(e, romoModal) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoModal:popupOpen', [romoModal, this]);
   }, this));
-  this.elem.on('modal:popupClose', $.proxy(function(e, modal) {
-    this.elem.trigger('modalVideo:modal:popupClose', [modal, this]);
+  Romo.on(this.elem, 'romoModal:popupClose', Romo.proxy(function(e, romoModal) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoModal:popupClose', [romoModal, this]);
   }, this));
-  this.elem.on('modal:dragStart', $.proxy(function(e, modal) {
-    this.elem.trigger('modalVideo:modal:dragStart', [modal, this]);
+  Romo.on(this.elem, 'romoModal:dragStart', Romo.proxy(function(e, romoModal) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoModal:dragStart', [romoModal, this]);
   }, this));
-  this.elem.on('modal:dragMove', $.proxy(function(e, placeX, placeY, modal) {
-    this.elem.trigger('modalVideo:modal:dragMove', [placeX, placeY, modal, this]);
+  Romo.on(this.elem, 'romoModal:dragMove', Romo.proxy(function(e, placeX, placeY, romoModal) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoModal:dragMove', [placeX, placeY, romoModal, this]);
   }, this));
-  this.elem.on('modal:dragStop', $.proxy(function(e, modal) {
-    this.elem.trigger('modalVideo:modal:dragStop', [modal, this]);
+  Romo.on(this.elem, 'romoModal:dragStop', Romo.proxy(function(e, romoModal) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoModal:dragStop', [romoModal, this]);
   }, this));
-  this.elem.on('modal:loadBodyStart', $.proxy(function(e, modal) {
-    this.elem.trigger('modalVideo:modal:loadBodyStart', [modal, this]);
+  Romo.on(this.elem, 'romoModal:loadBodyStart', Romo.proxy(function(e, romoModal) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoModal:loadBodyStart', [romoModal, this]);
   }, this));
-  this.elem.on('modal:loadBodySuccess', $.proxy(function(e, data, modal) {
-    this.elem.trigger('modalVideo:modal:loadBodySuccess', [data, modal, this]);
+  Romo.on(this.elem, 'romoModal:loadBodySuccess', Romo.proxy(function(e, data, romoModal) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoModal:loadBodySuccess', [data, romoModal, this]);
   }, this));
-  this.elem.on('modal:loadBodyError', $.proxy(function(e, xhr, modal) {
-    this.elem.trigger('modalVideo:modal:loadBodyError', [xhr, modal, this]);
+  Romo.on(this.elem, 'romoModal:loadBodyError', Romo.proxy(function(e, xhr, romoModal) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoModal:loadBodyError', [xhr, romoModal, this]);
   }, this));
-  this.elem.on('modal:dismiss', $.proxy(function(e, modal) {
-    this.elem.trigger('modalVideo:modal:dismiss', [modal, this]);
+  Romo.on(this.elem, 'romoModal:dismiss', Romo.proxy(function(e, romoModal) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoModal:dismiss', [romoModal, this]);
   }, this));
 }
 
-RomoModalVideo.prototype.doBindVideo = function() {
-  var videoElem = this.modal.popupElem.find('[data-romo-video-auto="modalVideo"]');
+RomoModalVideo.prototype._bindVideo = function() {
+  this.romoVideo = undefined;
 
-  this._bindVideoElemEvents(videoElem);
-  this._bindModalVideoTriggerEvents();
+  var videoElem = Romo.find(this.romoModal.popupElem, '[data-romo-video-auto="modalVideo"]')[0];
+  if (videoElem !== undefined) {
+    this._bindVideoElemEvents(videoElem);
+    this._bindModalVideoTriggerEvents();
 
-  this.video = videoElem.romoVideo()[0];
+    this.romoVideo = new RomoVideo(videoElem);
+  }
 }
-
-// private
 
 RomoModalVideo.prototype._bindVideoElemEvents = function(videoElem) {
   // playback events
 
-  videoElem.on('video:play', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:play', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:play', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:play', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:pause', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:pause', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:pause', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:pause', [videoObj, romoVideo, this]);
   }, this));
 
   // state events
 
-  videoElem.on('video:playing', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:playing', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:playing', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:playing', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:waiting', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:waiting', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:waiting', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:waiting', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:ended',  $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:ended', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:ended', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:ended', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:emptied', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:emptied', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:emptied', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:emptied', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:error', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:error', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:error', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:error', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:stalled', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:stalled', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:stalled', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:stalled', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:suspend', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:suspend', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:suspend', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:suspend', [videoObj, romoVideo, this]);
   }, this));
 
   // status events
 
-  videoElem.on('video:progress', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:progress', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:progress', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:progress', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:timeupdate', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:timeupdate', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:timeupdate', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:timeupdate', [videoObj, romoVideo, this]);
   }, this));
 
   // settings events
 
-  videoElem.on('video:volumechange', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:volumechange', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:volumechange', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:volumechange', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:durationchange', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:durationchange', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:durationchange', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:durationchange', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:ratechange', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:ratechange', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:ratechange', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:ratechange', [videoObj, romoVideo, this]);
   }, this));
 
   // fullscreen events
 
-  videoElem.on('video:enterFullscreen', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:enterFullscreen', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:enterFullscreen', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:enterFullscreen', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:exitFullscreen', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:exitFullscreen', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:exitFullscreen', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:exitFullscreen', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:fullscreenChange', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:fullscreenChange', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:fullscreenChange', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:fullscreenChange', [videoObj, romoVideo, this]);
   }, this));
 
   // load events
 
-  videoElem.on('video:loadstart', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:loadstart', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:loadstart', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:loadstart', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:loadedmetadata', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:loadedmetadata', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:loadedmetadata', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:loadedmetadata', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:loadeddata', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:loadeddata', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:loadeddata', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:loadeddata', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:canplay', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:canplay', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:canplay', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:canplay', [videoObj, romoVideo, this]);
   }, this));
-  videoElem.on('video:canplaythrough', $.proxy(function(e, videoObj, video) {
-    this.elem.trigger('modalVideo:video:canplaythrough', [videoObj, video, this]);
+  Romo.on(videoElem, 'romoVideo:canplaythrough', Romo.proxy(function(e, videoObj, romoVideo) {
+    Romo.trigger(this.elem, 'romoModalVideo:romoVideo:canplaythrough', [videoObj, romoVideo, this]);
   }, this));
 }
 
 RomoModalVideo.prototype._bindModalVideoTriggerEvents = function() {
   // playback triggers
 
-  this.elem.on('modalVideo:video:triggerPlay', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerPlay', []);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerPlay', Romo.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerPlay', []);
     }
   }, this));
-  this.elem.on('modalVideo:video:triggerPause', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerPause', []);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerPause', Romo.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerPause', []);
     }
   }, this));
-  this.elem.on('modalVideo:video:triggerTogglePlay', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerTogglePlay', []);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerTogglePlay', Romo.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerTogglePlay', []);
     }
   }, this));
-  this.elem.on('modalVideo:video:triggerSetPlaybackToTime', $.proxy(function(e, secondNum) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerSetPlaybackToTime', [secondNum]);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerSetPlaybackToTime', Romo.proxy(function(e, secondNum) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerSetPlaybackToTime', [secondNum]);
     }
   }, this));
-  this.elem.on('modalVideo:video:triggerSetPlaybackToFrame', $.proxy(function(e, frameNum) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerSetPlaybackToFrame', [frameNum]);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerSetPlaybackToFrame', Romo.proxy(function(e, frameNum) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerSetPlaybackToFrame', [frameNum]);
     }
   }, this));
-  this.elem.on('modalVideo:video:triggerSetPlaybackToPercent', $.proxy(function(e, percent) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerSetPlaybackToPercent', [percent]);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerSetPlaybackToPercent', Romo.proxy(function(e, percent) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerSetPlaybackToPercent', [percent]);
     }
   }, this));
-  this.elem.on('modalVideo:video:triggerModPlaybackByTime', $.proxy(function(e, secondsCount) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerModPlaybackByTime', [secondsCount]);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerModPlaybackByTime', Romo.proxy(function(e, secondsCount) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerModPlaybackByTime', [secondsCount]);
     }
   }, this));
-  this.elem.on('modalVideo:video:triggerModPlaybackByFrames', $.proxy(function(e, frameCount) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerModPlaybackByFrames', [frameCount]);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerModPlaybackByFrames', Romo.proxy(function(e, frameCount) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerModPlaybackByFrames', [frameCount]);
     }
   }, this));
-  this.elem.on('modalVideo:video:triggerModPlaybackByPercent', $.proxy(function(e, percent) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerModPlaybackByPercent', [percent]);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerModPlaybackByPercent', Romo.proxy(function(e, percent) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerModPlaybackByPercent', [percent]);
     }
   }, this));
 
   // settings triggers
 
-  this.elem.on('modalVideo:video:triggerMute', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerMute', []);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerMute', Romo.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerMute', []);
     }
   }, this));
-  this.elem.on('modalVideo:video:triggerUnmute', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerUnmute', []);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerUnmute', Romo.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerUnmute', []);
     }
   }, this));
-  this.elem.on('modalVideo:video:triggerToggleMute', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerToggleMute', []);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerToggleMute', Romo.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerToggleMute', []);
     }
   }, this));
-  this.elem.on('modalVideo:video:triggerSetVolumeToPercent', $.proxy(function(e, percent) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerSetVolumeToPercent', [percent]);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerSetVolumeToPercent', Romo.proxy(function(e, percent) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerSetVolumeToPercent', [percent]);
     }
   }, this));
-  this.elem.on('modalVideo:video:triggerModVolumeByPercent', $.proxy(function(e, percent) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerModVolumeByPercent', [percent]);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerModVolumeByPercent', Romo.proxy(function(e, percent) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerModVolumeByPercent', [percent]);
     }
   }, this));
-  this.elem.on('modalVideo:video:triggerSetPlaybackRate', $.proxy(function(e, rate) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerSetPlaybackRate', [rate]);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerSetPlaybackRate', Romo.proxy(function(e, rate) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerSetPlaybackRate', [rate]);
     }
   }, this));
-  this.elem.on('modalVideo:video:triggerModPlaybackRate', $.proxy(function(e, rate) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerModPlaybackRate', [rate]);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerModPlaybackRate', Romo.proxy(function(e, rate) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerModPlaybackRate', [rate]);
     }
   }, this));
 
   // fullscreen triggers
 
-  this.elem.on('modalVideo:video:triggerEnterFullscreen', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerEnterFullscreen', []);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerEnterFullscreen', Romo.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerEnterFullscreen', []);
     }
   }, this));
-  this.elem.on('modalVideo:video:triggerExitFullscreen', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerExitFullscreen', []);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerExitFullscreen', Romo.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerExitFullscreen', []);
     }
   }, this));
-  this.elem.on('modalVideo:video:triggerToggleFullscreen', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerToggleFullscreen', []);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerToggleFullscreen', Romo.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerToggleFullscreen', []);
     }
   }, this));
 
   // load triggers
 
-  this.elem.on('modalVideo:video:triggerLoad', $.proxy(function(e) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerLoad', []);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerLoad', Romo.proxy(function(e) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerLoad', []);
     }
   }, this));
-  this.elem.on('modalVideo:video:triggerModSource', $.proxy(function(e, source) {
-    if (this.video != undefined) {
-      this.video.elem.trigger('video:triggerModSource', [source]);
+  Romo.on(this.elem, 'romoModalVideo:romoVideo:triggerModSource', Romo.proxy(function(e, source) {
+    if (this.romoVideo != undefined) {
+      Romo.trigger(this.romoVideo.elem, 'romoVideo:triggerModSource', [source]);
     }
   }, this));
 }
 
-Romo.onInitUI(function(e) {
-  Romo.initUIElems(e, '[data-romo-modalVideo-auto="true"]').romoModalVideo();
-});
+// init
+
+Romo.addElemsInitSelector('[data-romo-modalVideo-auto="true"]', RomoModalVideo);
